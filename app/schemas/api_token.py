@@ -23,4 +23,4 @@ class APITokenResponse(BaseModel):
 class APITokenCreatedResponse(APITokenResponse):
     """Returned only on creation — token is shown once and never stored in plaintext."""
 
-    token: str
+    token: str = ""
