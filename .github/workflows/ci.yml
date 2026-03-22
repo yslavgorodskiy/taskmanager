@@ -29,10 +29,17 @@ jobs:
         run: pip install -r requirements.txt aiosqlite
 
       - name: Run tests
-        run: pytest tests/ -v --tb=short --cov=app --cov-report=term-missing --cov-fail-under=90
+        run: pytest tests/ -v --tb=short --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=90
         env:
           DATABASE_URL: "sqlite+aiosqlite:///:memory:"
           SECRET_KEY: ci-test-secret-key-at-least-32-chars-long
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
 
   lint:
     name: Lint
