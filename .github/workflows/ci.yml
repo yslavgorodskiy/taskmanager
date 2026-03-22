@@ -26,10 +26,10 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -r requirements.txt aiosqlite
+        run: pip install -r requirements.txt aiosqlite pytest-timeout
 
       - name: Run tests
-        run: pytest tests/ -v --tb=short
+        run: pytest tests/ -v --tb=long --timeout=30
         env:
           DATABASE_URL: "sqlite+aiosqlite:///:memory:"
           SECRET_KEY: ci-test-secret-key-at-least-32-chars-long
