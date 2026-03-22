@@ -1,7 +1,6 @@
 # TaskManager API
 
 [![CI](https://github.com/yslavgorodskiy/taskmanager/actions/workflows/ci.yml/badge.svg)](https://github.com/yslavgorodskiy/taskmanager/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/yslavgorodskiy/taskmanager/branch/main/graph/badge.svg)](https://codecov.io/gh/yslavgorodskiy/taskmanager)
 
 A production-ready task management REST API built with FastAPI and PostgreSQL.
 
