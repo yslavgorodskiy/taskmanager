@@ -28,24 +28,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt aiosqlite
 
-      - name: Check imports
-        run: |
-          python -c "
-          import os
-          print('DATABASE_URL:', os.environ.get('DATABASE_URL', 'NOT SET'))
-          from app.config import settings
-          print('settings.DATABASE_URL:', settings.DATABASE_URL)
-          from app.database import engine
-          print('Engine dialect:', engine.dialect.name)
-          print('All imports OK')
-          "
-        env:
-          DATABASE_URL: "sqlite+aiosqlite:///:memory:"
-          SECRET_KEY: ci-test-secret-key-at-least-32-chars-long
-
       - name: Run tests
-        timeout-minutes: 3
-        run: pytest tests/ -v --tb=long -p no:timeout
+        run: pytest tests/ -v --tb=short
         env:
           DATABASE_URL: "sqlite+aiosqlite:///:memory:"
           SECRET_KEY: ci-test-secret-key-at-least-32-chars-long
