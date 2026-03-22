@@ -6,9 +6,8 @@ AsyncSessionLocal is patched globally so background tasks (webhook dispatch)
 also use the test DB instead of the real PostgreSQL connection.
 """
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
-import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
