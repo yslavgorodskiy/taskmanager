@@ -2,18 +2,16 @@
 Shared pytest fixtures.
 
 Uses an in-memory SQLite database so tests have no external dependencies.
-AsyncSessionLocal is patched globally so background tasks (webhook dispatch)
-also use the test DB instead of the real PostgreSQL connection.
+`dispatch_webhook_event` is mocked so background tasks never open real
+network connections or DB sessions during test runs.
 """
 
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-import app.database as app_database
-import app.services.webhook as webhook_service_module
 from app.database import Base, get_db
 from app.main import app
 
@@ -45,10 +43,8 @@ async def client(db_session: AsyncSession):
 
     app.dependency_overrides[get_db] = override_get_db
 
-    # Patch AsyncSessionLocal used by background webhook dispatch so it
-    # doesn't open a real PostgreSQL connection during tests.
-    with patch.object(app_database, "AsyncSessionLocal", _TestSessionLocal), \
-         patch.object(webhook_service_module, "AsyncSessionLocal", _TestSessionLocal):
+    # Mock webhook background tasks — no real DB sessions or HTTP calls in tests
+    with patch("app.services.task.dispatch_webhook_event", new=AsyncMock()):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
             yield ac
 
