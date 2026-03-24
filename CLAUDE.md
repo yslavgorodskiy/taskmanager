@@ -66,6 +66,10 @@ Services fire webhook events (`task.created`, `task.updated`, `task.status_chang
 - **Pattern**: `dispatch_webhook_event` is patched as AsyncMock in the client fixture so webhook HTTP calls don't fire during tests.
 - **CI requirement**: 90% code coverage minimum (`--cov-fail-under=90`).
 
+## Per-User Settings
+
+The User model has a `column_settings` JSON column storing task list display preferences (visible columns, min/max widths). Endpoints: `GET/PUT /users/me/column-settings`. Schema: `ColumnSettingsSchema` with `visible: list[str]` and `widths: dict[str, ColumnWidthConfig]`. Default for new users: show only the title column.
+
 ## Key Conventions
 
 - All queries filter by `owner_id` — never return data across users.
@@ -73,3 +77,4 @@ Services fire webhook events (`task.created`, `task.updated`, `task.status_chang
 - Tags use a many-to-many association table (`task_tags`).
 - Direction deletion sets `direction_id=NULL` on tasks (SET NULL FK).
 - Pydantic settings loaded from `.env` file; `SECRET_KEY` is required (no default).
+- User preferences stored as JSON columns on the User model (not separate tables).
