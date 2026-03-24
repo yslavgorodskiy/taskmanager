@@ -5,7 +5,7 @@ from app.core.dependencies import get_current_active_user
 from app.core.security import hash_password
 from app.database import get_db
 from app.models.user import User
-from app.schemas.user import UserResponse, UserUpdate
+from app.schemas.user import ColumnSettingsSchema, UserResponse, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -28,3 +28,20 @@ async def update_me(
     await db.commit()
     await db.refresh(current_user)
     return current_user
+
+
+@router.get("/me/column-settings", response_model=ColumnSettingsSchema | None, summary="Get column display settings")
+async def get_column_settings(current_user: User = Depends(get_current_active_user)):
+    return current_user.column_settings
+
+
+@router.put("/me/column-settings", response_model=ColumnSettingsSchema, summary="Save column display settings")
+async def save_column_settings(
+    data: ColumnSettingsSchema,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+) -> ColumnSettingsSchema:
+    current_user.column_settings = data.model_dump()
+    await db.commit()
+    await db.refresh(current_user)
+    return current_user.column_settings

@@ -21,12 +21,23 @@ class UserUpdate(BaseModel):
     password: str | None = None
 
 
+class ColumnWidthConfig(BaseModel):
+    minWidth: int | None = None
+    maxWidth: int | None = None
+
+
+class ColumnSettingsSchema(BaseModel):
+    visible: list[str]
+    widths: dict[str, ColumnWidthConfig] = {}
+
+
 class UserResponse(BaseModel):
     id: int
     email: str
     full_name: str | None
     is_active: bool
     is_superuser: bool
+    column_settings: ColumnSettingsSchema | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
