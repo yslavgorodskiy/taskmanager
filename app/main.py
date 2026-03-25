@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import api_tokens, auth, directions, tags, tasks, users, webhooks
+from app.routers import api_tokens, auth, directions, saved_views, tags, tasks, users, webhooks
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -31,6 +31,7 @@ app.include_router(directions.router)
 app.include_router(tags.router)
 app.include_router(api_tokens.router)
 app.include_router(webhooks.router)
+app.include_router(saved_views.router)
 
 
 @app.get("/health", tags=["System"], summary="Health check")

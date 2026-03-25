@@ -23,3 +23,4 @@ class User(Base):
     tags = relationship("Tag", back_populates="owner", cascade="all, delete-orphan")
     api_tokens = relationship("APIToken", back_populates="owner", cascade="all, delete-orphan")
     webhooks = relationship("Webhook", back_populates="owner", cascade="all, delete-orphan")
+    saved_views = relationship("SavedView", back_populates="owner", cascade="all, delete-orphan")
