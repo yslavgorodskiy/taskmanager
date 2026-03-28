@@ -11,6 +11,7 @@ from app.models.tag import task_tags
 class TaskStatus(str, enum.Enum):
     NEW = "new"
     IN_PROGRESS = "in_progress"
+    ON_HOLD = "on_hold"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
