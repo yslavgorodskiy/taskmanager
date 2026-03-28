@@ -30,6 +30,9 @@ uvicorn app.main:app --reload --port 8000
 # Run Alembic migrations
 alembic upgrade head
 
+# Create new migration after model changes
+alembic revision --autogenerate -m "description"
+
 # Seed database
 python -m scripts.seed
 ```
@@ -64,11 +67,16 @@ Services fire webhook events (`task.created`, `task.updated`, `task.status_chang
 - **Database**: In-memory SQLite via aiosqlite (no external DB needed). Requires `aiosqlite` package (not in requirements.txt, installed separately in CI).
 - **Fixtures** (tests/conftest.py): `client` (AsyncClient with ASGI transport), `auth_headers` (registers+logs in a user, returns Bearer header dict), `db_session`, `clean_tables` (autouse, truncates all tables between tests).
 - **Pattern**: `dispatch_webhook_event` is patched as AsyncMock in the client fixture so webhook HTTP calls don't fire during tests.
-- **CI requirement**: 90% code coverage minimum (`--cov-fail-under=90`).
+- **Helper**: `_register_and_login(client, email)` in conftest.py — registers a user and returns token JSON. The `auth_headers` fixture wraps this to return a ready-to-use Bearer header dict.
+- **CI requirement**: 90% code coverage minimum (`--cov-fail-under=90`). CI tests on Python 3.11 and 3.12.
 
 ## Per-User Settings
 
 The User model has a `column_settings` JSON column storing task list display preferences (visible columns, min/max widths). Endpoints: `GET/PUT /users/me/column-settings`. Schema: `ColumnSettingsSchema` with `visible: list[str]` and `widths: dict[str, ColumnWidthConfig]`. Default for new users: show only the title column.
+
+## Saved Views
+
+CRUD at `/saved-views/` — stores named filter/sort/display presets as a JSON `settings` column on the `SavedView` model. Unlike other entities, this router does inline DB queries (no service layer). Owner-isolated like everything else.
 
 ## Key Conventions
 
@@ -76,5 +84,5 @@ The User model has a `column_settings` JSON column storing task list display pre
 - Task relationships (direction, tags) are eagerly loaded via `selectinload`/`joinedload` in service `_fetch` methods.
 - Tags use a many-to-many association table (`task_tags`).
 - Direction deletion sets `direction_id=NULL` on tasks (SET NULL FK).
-- Pydantic settings loaded from `.env` file; `SECRET_KEY` is required (no default).
+- Pydantic settings loaded from `.env` file; `SECRET_KEY` has a placeholder default (`"change-me"`) — must be overridden in production.
 - User preferences stored as JSON columns on the User model (not separate tables).
